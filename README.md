@@ -72,3 +72,8 @@ make check  # Go vet and JavaScript syntax check; requires Node
 
 Most provider tests use protocol fixtures. See the
 [catalog](docs/provider-catalog.md#verification) for live integration test setup.
+
+## License
+
+Licensed under [Apache 2.0](LICENSE). Bundled fonts retain their
+[separate license](control/web/FONT-LICENSE.txt).
