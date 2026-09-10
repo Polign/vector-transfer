@@ -12,8 +12,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/anuptalwalkar/vector-transfer/accountauth"
-	"github.com/anuptalwalkar/vector-transfer/connector"
+	"github.com/Polign/vector-transfer/accountauth"
+	"github.com/Polign/vector-transfer/connector"
 )
 
 type testAccounts struct{}

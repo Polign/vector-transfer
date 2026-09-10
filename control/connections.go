@@ -19,7 +19,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/anuptalwalkar/vector-transfer/connector"
+	"github.com/Polign/vector-transfer/connector"
 )
 
 var ErrVaultUnavailable = errors.New("connection credential store unavailable")

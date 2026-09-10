@@ -14,7 +14,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/anuptalwalkar/vector-transfer/connector"
+	"github.com/Polign/vector-transfer/connector"
 )
 
 // SourceFixture describes a fixed dataset. Open must return a fresh connector

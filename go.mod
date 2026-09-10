@@ -1,4 +1,4 @@
-module github.com/anuptalwalkar/vector-transfer
+module github.com/Polign/vector-transfer
 
 go 1.25.0
 

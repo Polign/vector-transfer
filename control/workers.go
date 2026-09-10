@@ -16,7 +16,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/anuptalwalkar/vector-transfer/internal/durable"
+	"github.com/Polign/vector-transfer/internal/durable"
 )
 
 // WorkerConnection contains deliberately limited, non-secret discovery data.

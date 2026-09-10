@@ -14,8 +14,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/anuptalwalkar/vector-transfer/connector"
-	"github.com/anuptalwalkar/vector-transfer/control"
+	"github.com/Polign/vector-transfer/connector"
+	"github.com/Polign/vector-transfer/control"
 )
 
 type fixtureSource struct {

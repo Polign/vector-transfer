@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/anuptalwalkar/vector-transfer/connector"
+	"github.com/Polign/vector-transfer/connector"
 )
 
 func TestRealPolignCheckpointRecovery(t *testing.T) {

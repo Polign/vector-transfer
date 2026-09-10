@@ -21,9 +21,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/anuptalwalkar/vector-transfer/accountauth"
-	"github.com/anuptalwalkar/vector-transfer/connector"
-	"github.com/anuptalwalkar/vector-transfer/control"
+	"github.com/Polign/vector-transfer/accountauth"
+	"github.com/Polign/vector-transfer/connector"
+	"github.com/Polign/vector-transfer/control"
 )
 
 // Run executes the normal CLI, optionally adding third-party connector kinds.

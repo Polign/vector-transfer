@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/anuptalwalkar/vector-transfer/connector"
+	"github.com/Polign/vector-transfer/connector"
 )
 
 type sourceFunc func(context.Context, string, int) (connector.Page, error)

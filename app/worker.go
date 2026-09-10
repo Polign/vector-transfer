@@ -10,8 +10,8 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/anuptalwalkar/vector-transfer/connector"
-	"github.com/anuptalwalkar/vector-transfer/worker"
+	"github.com/Polign/vector-transfer/connector"
+	"github.com/Polign/vector-transfer/worker"
 )
 
 func runWorker(args []string, factories ...connector.Factories) error {

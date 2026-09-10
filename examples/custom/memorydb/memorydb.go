@@ -10,7 +10,7 @@ import (
 	"strconv"
 	"sync"
 
-	"github.com/anuptalwalkar/vector-transfer/connector"
+	"github.com/Polign/vector-transfer/connector"
 )
 
 // DB stores one configured resource. Real connectors replace the map with their

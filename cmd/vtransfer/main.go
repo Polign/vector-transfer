@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/anuptalwalkar/vector-transfer/app"
+	"github.com/Polign/vector-transfer/app"
 )
 
 func main() {

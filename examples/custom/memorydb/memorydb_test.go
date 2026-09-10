@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/anuptalwalkar/vector-transfer/connector"
-	"github.com/anuptalwalkar/vector-transfer/connector/conformance"
-	"github.com/anuptalwalkar/vector-transfer/examples/custom/memorydb"
+	"github.com/Polign/vector-transfer/connector"
+	"github.com/Polign/vector-transfer/connector/conformance"
+	"github.com/Polign/vector-transfer/examples/custom/memorydb"
 )
 
 func TestSourceContract(t *testing.T) {
