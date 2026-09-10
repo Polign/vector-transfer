@@ -1,0 +1,18 @@
+{
+  "connections": {
+    "production-source": {
+      "kind": "pinecone",
+      "endpoint": "https://YOUR-INDEX-HOST.svc.YOUR-REGION.pinecone.io",
+      "namespace": "documents",
+      "api_key_env": "SOURCE_API_KEY",
+      "read_only": true
+    },
+    "polign-destination": {
+      "kind": "polign",
+      "endpoint": "https://YOUR-POLIGN-DATABASE",
+      "collection": "documents",
+      "api_key_env": "DESTINATION_API_KEY",
+      "write_only": true
+    }
+  }
+}

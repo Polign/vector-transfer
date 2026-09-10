@@ -1,0 +1,144 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Single-node Polign Vector Transfer with private ingress through Cloudflare Tunnel
+Parameters:
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+  SubnetId:
+    Type: AWS::EC2::Subnet::Id
+  ImageId:
+    Type: AWS::EC2::Image::Id
+  BundleKey:
+    Type: String
+    Default: ''
+  BundleSHA256:
+    Type: String
+    Default: ''
+    AllowedPattern: '^$|^[a-f0-9]{64}$'
+Conditions:
+  ProvisionHost: !Not [!Equals [!Ref BundleKey, '']]
+Resources:
+  Artifacts:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      BucketName: !Sub polign-vector-transfer-${AWS::AccountId}-${AWS::Region}
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      OwnershipControls:
+        Rules: [{ObjectOwnership: BucketOwnerEnforced}]
+      VersioningConfiguration:
+        Status: Enabled
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault: {SSEAlgorithm: AES256}
+  ArtifactPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref Artifacts
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Deny
+            Principal: '*'
+            Action: s3:*
+            Resource: [!GetAtt Artifacts.Arn, !Sub '${Artifacts.Arn}/*']
+            Condition: {Bool: {'aws:SecureTransport': false}}
+  HostSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: No inbound access; Cloudflare tunnel and SSM use outbound connections
+      VpcId: !Ref VpcId
+      SecurityGroupIngress: []
+      SecurityGroupEgress:
+        - IpProtocol: '-1'
+          CidrIp: 0.0.0.0/0
+  HostRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal: {Service: ec2.amazonaws.com}
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: SystemsManagerChannels
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ssm:UpdateInstanceInformation
+                  - ssmmessages:CreateControlChannel
+                  - ssmmessages:CreateDataChannel
+                  - ssmmessages:OpenControlChannel
+                  - ssmmessages:OpenDataChannel
+                  - ec2messages:AcknowledgeMessage
+                  - ec2messages:DeleteMessage
+                  - ec2messages:FailMessage
+                  - ec2messages:GetEndpoint
+                  - ec2messages:GetMessages
+                  - ec2messages:SendReply
+                Resource: '*'
+        - PolicyName: TransferBootstrap
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: s3:GetObject
+                Resource: !Sub '${Artifacts.Arn}/releases/*'
+              - Effect: Allow
+                Action: ssm:GetParameter
+                Resource:
+                  - !Sub arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/polign/vector-transfer/tunnel
+                  - !Sub arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/polign/vector-transfer/credential-key
+  HostProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles: [!Ref HostRole]
+  Host:
+    Type: AWS::EC2::Instance
+    Condition: ProvisionHost
+    Properties:
+      ImageId: !Ref ImageId
+      InstanceType: t4g.small
+      IamInstanceProfile: !Ref HostProfile
+      SubnetId: !Ref SubnetId
+      SecurityGroupIds: [!Ref HostSecurityGroup]
+      MetadataOptions:
+        HttpTokens: required
+        HttpPutResponseHopLimit: 1
+      BlockDeviceMappings:
+        - DeviceName: /dev/xvda
+          Ebs:
+            VolumeSize: 20
+            VolumeType: gp3
+            Encrypted: true
+            DeleteOnTermination: false
+      Tags:
+        - {Key: Name, Value: polign-vector-transfer}
+        - {Key: Application, Value: vector-transfer}
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          set -euo pipefail
+          umask 077
+          mkdir -p /opt/vector-transfer
+          aws s3 cp s3://${Artifacts}/${BundleKey} /tmp/vector-transfer.tar.gz --region ${AWS::Region} --only-show-errors
+          echo '${BundleSHA256}  /tmp/vector-transfer.tar.gz' | sha256sum --check --status
+          tar -xzf /tmp/vector-transfer.tar.gz -C /opt/vector-transfer
+          bash /opt/vector-transfer/deploy/install.sh
+Outputs:
+  ArtifactBucket:
+    Value: !Ref Artifacts
+  HostRoleArn:
+    Value: !GetAtt HostRole.Arn
+  InstanceId:
+    Condition: ProvisionHost
+    Value: !Ref Host
+  URL:
+    Value: https://transfer.polign.com

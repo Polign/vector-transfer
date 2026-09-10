@@ -1,0 +1,6 @@
+{
+  "connections": {
+    "sample": {"kind": "memorydb", "read_only": true, "options": {"database": "sample"}},
+    "destination": {"kind": "memorydb", "options": {"database": "destination"}}
+  }
+}

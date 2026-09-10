@@ -1,0 +1,6 @@
+{
+  "connections_file": "connections.json",
+  "pairs": [
+    {"source": "production-source", "sink": "polign-destination", "dimension": 1536}
+  ]
+}

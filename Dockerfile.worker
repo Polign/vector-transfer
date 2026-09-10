@@ -1,0 +1,14 @@
+FROM golang:1.25 AS build
+WORKDIR /src
+COPY go.mod go.sum ./
+RUN go mod download
+COPY . .
+RUN CGO_ENABLED=0 go build -trimpath -o /out/vtransfer ./cmd/vtransfer
+
+FROM debian:bookworm-slim
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates && rm -rf /var/lib/apt/lists/* \
+    && mkdir /data && chown 65532:65532 /data
+COPY --from=build /out/vtransfer /usr/local/bin/vtransfer
+USER 65532:65532
+ENTRYPOINT ["/usr/local/bin/vtransfer"]
+CMD ["worker", "run", "-data", "/data", "-config", "/config/worker.json"]

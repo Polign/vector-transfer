@@ -1,0 +1,14 @@
+/bin/
+/data/
+/config.json
+/.cache/
+*.log
+/.deploy/
+/account-config.json
+/account-connections.json
+
+__pycache__/
+
+/worker-data/
+/worker.json
+/enrollment.token

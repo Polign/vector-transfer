@@ -1,0 +1,11 @@
+.git
+.deploy
+data
+worker-data
+config.json
+worker.json
+enrollment.token
+account-config.json
+account-connections.json
+*.log
+**/__pycache__

@@ -1,0 +1,25 @@
+[Unit]
+Description=Cloudflare Tunnel for Polign Vector Transfer
+After=network-online.target vector-transfer.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=cloudflared
+Group=cloudflared
+ExecStart=/opt/vector-transfer/cloudflared --no-autoupdate --config /etc/cloudflared/vector-transfer.yml tunnel run
+Restart=always
+RestartSec=5
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+CapabilityBoundingSet=
+
+[Install]
+WantedBy=multi-user.target

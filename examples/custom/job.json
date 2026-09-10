@@ -1,0 +1,1 @@
+{"name":"Custom connector example","source":"sample","sink":"destination","dimension":2,"batch_size":2}

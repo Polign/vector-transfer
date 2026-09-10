@@ -1,0 +1,8 @@
+{
+  "name": "First vector transfer",
+  "source": "demo-source",
+  "sink": "demo-sink",
+  "dimension": 4,
+  "batch_size": 100,
+  "max_attempts": 5
+}

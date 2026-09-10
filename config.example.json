@@ -1,0 +1,30 @@
+{
+  "connections": {
+    "s3-documents": {
+      "kind": "s3vectors",
+      "region": "us-east-1",
+      "bucket": "my-vector-bucket",
+      "index": "documents"
+    },
+    "polign-documents": {
+      "kind": "polign",
+      "endpoint": "http://127.0.0.1:23000",
+      "collection": "documents",
+      "api_key_env": "POLIGN_API_KEY"
+    },
+    "turbopuffer-documents": {
+      "kind": "turbopuffer",
+      "endpoint": "https://gcp-us-central1.turbopuffer.com",
+      "namespace": "documents",
+      "api_key_env": "TURBOPUFFER_API_KEY",
+      "distance_metric": "cosine_distance",
+      "id_type": "string"
+    },
+    "pinecone-documents": {
+      "kind": "pinecone",
+      "endpoint": "https://YOUR-INDEX-HOST.svc.YOUR-REGION.pinecone.io",
+      "namespace": "documents",
+      "api_key_env": "PINECONE_API_KEY"
+    }
+  }
+}

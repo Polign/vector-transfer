@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Create connection · Polign</title><link rel="stylesheet" href="/style.css"><link rel="icon" href="/favicon.svg">
+<script src="/connection-fields.js" defer></script><script src="/worker-script.js" defer></script><script src="/connection-setup.js" defer></script>
+</head>
+<body>
+<header><a class="brand" href="/">Polign</a><a class="product-name" href="/">Vector Transfer</a><div class="account-nav"><span id="setup-identity" class="muted"></span><a class="quiet" href="/">Dashboard</a></div></header>
+<main class="workspace-content setup-page">
+<p class="eyebrow">YOUR INFRASTRUCTURE</p><h1>Create connection</h1>
+<p class="setup-intro">Connect your databases, run a setup script on your own machine, then start a transfer here. Database credentials stay on that machine.</p>
+<nav class="setup-steps" aria-label="Setup progress"><span id="step-configure" aria-current="step">Configure databases</span><span id="step-connect">Connect worker</span><span id="step-transfer">Create transfer</span></nav>
+<p id="setup-loading" role="status">Loading your account…</p>
+<section id="setup-login" class="panel setup-card" hidden><p>Sign in to create a worker for your account.</p><a class="login-link" id="setup-sign-in" href="/auth/login">Sign in with Polign ↗</a></section>
+<p id="setup-error" class="error" role="alert" hidden></p><button id="setup-retry" class="quiet" hidden>Try again</button>
+<form id="connection-form" hidden>
+<fieldset id="setup-fields" class="setup-fields">
+<section class="panel setup-card"><h2>Where will the worker run?</h2><p>Use a Mac or Linux machine that can reach both databases and stay running. No inbound ports are needed. You’ll run a script there after configuring the databases.</p><div class="form-row"><label>Worker name<input name="worker_name" required maxlength="128" pattern="[A-Za-z0-9_.\-]+" value="production-transfer"></label><label>Platform<select name="platform"><option value="auto">Detect on the worker machine</option><option value="linux-amd64">Linux x64</option><option value="linux-arm64">Linux ARM64</option><option value="darwin-arm64">macOS Apple Silicon</option></select></label></div><label>Vector dimension <span class="hint">Use the source index’s vector size. The destination must match.</span><input name="dimension" type="number" min="1" max="65536" required placeholder="1536"></label></section>
+<div class="connection-grid"><section class="panel setup-card"><h2>Source</h2><div id="setup-source"></div></section><section class="panel setup-card"><h2>Destination</h2><div id="setup-sink"></div></section></div>
+<p class="hint">Database settings stay in this browser until you download the script. Credentials are requested on the worker machine and held in memory. S3 Vectors uses the worker’s AWS identity.</p>
+<p class="hint">Prepare the destination for the same dimensions and metadata types. Transfers replace matching IDs; keep the source unchanged during transfers and resumes.</p>
+<button id="generate-script" type="submit">Continue to worker setup →</button>
+</fieldset>
+</form>
+<section id="setup-result" class="panel setup-card" hidden aria-live="polite">
+<h2>Connect your worker</h2><p>Download the script, review it, and run it within 10 minutes. It contains a single-use enrollment token.</p>
+<div class="setup-actions"><button id="download-script">Download setup-worker.sh</button><button id="copy-script" class="quiet">Copy script</button></div>
+<pre>chmod 600 setup-worker.sh
+bash setup-worker.sh</pre>
+<p>Run these commands in the folder containing the downloaded script. If your worker is another machine, copy the script there first. Enter database credentials when prompted and leave the process running.</p><p id="setup-worker-location"></p>
+<details><summary>Review generated script</summary><pre id="setup-script-preview"></pre></details>
+<p id="setup-expiry" class="hint"></p><button id="edit-setup" class="quiet">Edit database settings</button>
+</section>
+<section id="worker-status" class="panel setup-card" hidden>
+<p class="eyebrow">WORKER CONNECTION</p><h2 id="worker-status-title" role="status"></h2><p id="worker-status-message"></p>
+<p id="worker-pair-summary"></p><a id="continue-transfer" class="login-link" hidden>Create transfer →</a>
+<div id="worker-restart" hidden><p>On the machine where you installed this worker, run:</p><pre id="worker-restart-command"></pre><p class="hint">If you used a custom installation folder, run its run-worker.sh instead. Keep the original state folder to preserve checkpoints.</p></div>
+<button id="check-worker" class="quiet">Check again</button><button id="restart-setup" class="quiet" hidden>Generate a new setup script</button>
+<details><summary>Worker not connecting?</summary><ul><li>Check the terminal for a credential or configuration error. Fix it locally, then restart the worker.</li><li>Allow outbound HTTPS to transfer.polign.com and access to both databases.</li><li>If the download checksum changed, generate a new script before enrollment.</li></ul><p>Connection settings and checkpoints stay on your worker. This page can detect the worker connection, but database access is checked when a transfer runs.</p></details>
+</section>
+<details class="setup-reference"><summary>Manual installation and downloads</summary><p><a href="/worker-reference.html">Manual setup guide, download links, and curl commands ↗</a></p></details>
+</main>
+</body></html>

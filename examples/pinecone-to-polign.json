@@ -1,0 +1,8 @@
+{
+  "name": "Pinecone documents to Polign",
+  "source": "pinecone-documents",
+  "sink": "polign-documents",
+  "dimension": 1536,
+  "batch_size": 100,
+  "max_attempts": 5
+}

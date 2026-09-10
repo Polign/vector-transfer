@@ -1,0 +1,10 @@
+tunnel: 5f7bc1ac-b482-4e77-ab3a-66daa599381b
+credentials-file: /etc/cloudflared/vector-transfer.json
+metrics: 127.0.0.1:20241
+loglevel: warn
+ingress:
+  - hostname: transfer.polign.com
+    service: http://127.0.0.1:23005
+    originRequest:
+      httpHostHeader: transfer.polign.com
+  - service: http_status:404

@@ -1,0 +1,22 @@
+{
+  "connections": {
+    "my-pinecone-export": {
+      "kind": "pinecone",
+      "endpoint": "https://REPLACE.svc.us-east-1-aws.pinecone.io",
+      "namespace": "documents",
+      "api_key_env": "PINECONE_EXPORT_KEY",
+      "read_only": true,
+      "read_subjects": ["REPLACE_WITH_COGNITO_SUBJECT"]
+    },
+    "my-s3-import": {
+      "kind": "s3vectors",
+      "region": "us-west-2",
+      "bucket": "REPLACE_VECTOR_BUCKET",
+      "index": "documents",
+      "aws_role_arn": "arn:aws:iam::REPLACE_ACCOUNT:role/vector-transfer-import",
+      "aws_external_id_env": "S3_IMPORT_EXTERNAL_ID",
+      "write_only": true,
+      "write_subjects": ["REPLACE_WITH_COGNITO_SUBJECT"]
+    }
+  }
+}

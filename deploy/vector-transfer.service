@@ -1,0 +1,30 @@
+[Unit]
+Description=Polign Vector Transfer
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=vtransfer
+Group=vtransfer
+ExecStart=/opt/vector-transfer/vtransfer serve -addr 127.0.0.1:23005 -account-config /etc/vector-transfer/account-config.json -config /etc/vector-transfer/connections.json -data /var/lib/vector-transfer -credential-key-file /etc/vector-transfer/credential.key -worker-downloads /opt/vector-transfer/downloads
+EnvironmentFile=-/etc/vector-transfer/credentials.env
+Restart=on-failure
+RestartSec=3
+TimeoutStopSec=90
+UMask=0077
+StateDirectory=vector-transfer
+StateDirectoryMode=0700
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+CapabilityBoundingSet=
+ReadWritePaths=/var/lib/vector-transfer
+
+[Install]
+WantedBy=multi-user.target

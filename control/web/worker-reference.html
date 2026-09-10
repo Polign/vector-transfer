@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Manual worker setup · Polign</title>
+<link rel="stylesheet" href="/style.css"><link rel="icon" href="/favicon.svg">
+</head>
+<body>
+<header><a class="brand" href="/">Polign</a><a class="product-name" href="/">Vector Transfer</a></header>
+<main class="workspace-content worker-guide">
+<h1>Manual worker setup</h1>
+<p>A worker is a program you run on your own server to move embeddings and metadata between databases. Use it to keep database credentials and checkpoints in your infrastructure while you create and monitor transfers in the Polign dashboard. It connects to Polign over HTTPS and reports progress; vector data does not pass through the control plane.</p>
+<p><a href="/connections/new">Create connection</a> generates a script that downloads, configures, enrolls, and starts your worker. Use the commands below for manual installation.</p>
+<h2>Download</h2>
+<p>Choose your platform. These commands download the worker, verify its checksum, and save it as <code>vtransfer</code>. Then enroll and configure it below.</p>
+<h3>Linux x64</h3>
+<p><a href="/downloads/vtransfer-linux-amd64">Download vtransfer-linux-amd64</a></p>
+<pre>curl -fSLO https://transfer.polign.com/downloads/vtransfer-linux-amd64 &amp;&amp;
+curl -fSLO https://transfer.polign.com/downloads/SHA256SUMS &amp;&amp;
+sha256sum --ignore-missing --check SHA256SUMS &amp;&amp;
+chmod 755 vtransfer-linux-amd64 &amp;&amp;
+mv vtransfer-linux-amd64 vtransfer</pre>
+<h3>Linux ARM64</h3>
+<p><a href="/downloads/vtransfer-linux-arm64">Download vtransfer-linux-arm64</a></p>
+<pre>curl -fSLO https://transfer.polign.com/downloads/vtransfer-linux-arm64 &amp;&amp;
+curl -fSLO https://transfer.polign.com/downloads/SHA256SUMS &amp;&amp;
+sha256sum --ignore-missing --check SHA256SUMS &amp;&amp;
+chmod 755 vtransfer-linux-arm64 &amp;&amp;
+mv vtransfer-linux-arm64 vtransfer</pre>
+<h3>macOS Apple Silicon</h3>
+<p><a href="/downloads/vtransfer-darwin-arm64">Download vtransfer-darwin-arm64</a></p>
+<pre>curl -fSLO https://transfer.polign.com/downloads/vtransfer-darwin-arm64 &amp;&amp;
+curl -fSLO https://transfer.polign.com/downloads/SHA256SUMS &amp;&amp;
+shasum -a 256 --ignore-missing --check SHA256SUMS &amp;&amp;
+chmod 755 vtransfer-darwin-arm64 &amp;&amp;
+mv vtransfer-darwin-arm64 vtransfer</pre>
+<h2>Enroll</h2>
+<p>The generated setup script handles enrollment. For manual setup, send <code>POST /v1/workers</code> with <code>{"name":"production"}</code> using your authenticated session and CSRF token. Save the returned <code>enrollment_token</code> privately as <code>enrollment.token</code> on the worker machine. It expires in 10 minutes.</p>
+<pre>chmod 600 enrollment.token
+./vtransfer worker enroll -url https://transfer.polign.com -data ./worker-data -token-file ./enrollment.token</pre>
+<p>Remove the token file after enrollment succeeds. Keep <code>worker-data</code> private and persistent. Use one process per worker identity.</p>
+<h2>Configure connections</h2>
+<p>Create <code>connections.json</code> locally. This example reads Pinecone and writes to a Polign collection:</p>
+<pre>{
+  "connections": {
+    "production-source": {
+      "kind": "pinecone",
+      "endpoint": "https://YOUR-PINECONE-INDEX-HOST",
+      "namespace": "documents",
+      "api_key_env": "SOURCE_API_KEY",
+      "read_only": true
+    },
+    "polign-destination": {
+      "kind": "polign",
+      "endpoint": "https://YOUR-POLIGN-DATABASE",
+      "collection": "documents",
+      "api_key_env": "DESTINATION_API_KEY",
+      "write_only": true
+    }
+  }
+}</pre>
+<p>Inject the referenced environment variables through your secret manager or process supervisor. Use verified TLS and resource-scoped database permissions. Restart the worker after changing API keys.</p>
+<p>Create <code>worker.json</code> to approve the connection pair and dimension:</p>
+<pre>{
+  "connections_file": "connections.json",
+  "pairs": [
+    {"source": "production-source", "sink": "polign-destination", "dimension": 1536}
+  ]
+}</pre>
+<h2>Run and submit</h2>
+<pre>./vtransfer worker run -data ./worker-data -config ./worker.json</pre>
+<p>Wait for <strong>online</strong> in the dashboard. Choose <strong>New transfer</strong>, select your worker and approved connections, then submit. One worker runs one job at a time. Configure a supervisor to start it after a machine reboot.</p>
+<h2>Recovery</h2>
+<ul>
+<li>Keep the source unchanged during transfers and resumes. Matching destination IDs are replaced.</li>
+<li>After a restart, reuse the same data directory and connection settings. Encrypt and back up that directory.</li>
+<li>For a failed job, fix the cause and choose <strong>Resume transfer</strong>. Missing checkpoints require restoring the original worker data.</li>
+<li>Connection loss stops execution. Cancellation or revocation cannot retract a database request already in flight. A crash can replay a batch.</li>
+</ul>
+<p>The control plane can request only locally approved transfer pairs. You control the worker's installation, database access, and updates.</p>
+<p><a href="/">← Return to transfers</a></p>
+</main>
+</body>
+</html>
